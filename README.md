@@ -2,6 +2,8 @@
 
 Este proyecto es una aplicación web moderna que permite a los usuarios gestionar perfiles con información personal y de facturación. La aplicación incluye características como visualización de fotos en carrusel, integración con servicios meteorológicos y manejo de datos de usuario.
 
+🌐 **Demo en vivo**: [https://challenge-trd-kxpk.vercel.app/](https://challenge-trd-kxpk.vercel.app/)
+
 ## 🚀 Características Principales
 
 - Gestión de perfiles de usuario
@@ -45,15 +47,22 @@ Este proyecto es una aplicación web moderna que permite a los usuarios gestiona
    yarn install
    ```
 
-3. **Configurar variables de entorno**
-   Crear un archivo `.env.local` en la raíz del proyecto con las siguientes variables:
+3. **Configurar Supabase**
+
+   - Crear una cuenta en [Supabase](https://supabase.com)
+   - Crear un nuevo proyecto
+   - En el panel de control, ir a Settings > API
+   - Copiar el `Project URL` y `anon public` key
+
+4. **Configurar variables de entorno**
+   Crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
 
    ```
-   NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
+   NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase    # Project URL de Supabase
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima  # anon public key de Supabase
    ```
 
-4. **Ejecutar el proyecto en modo desarrollo**
+5. **Ejecutar el proyecto en modo desarrollo**
 
    ```bash
    npm run dev
@@ -61,7 +70,7 @@ Este proyecto es una aplicación web moderna que permite a los usuarios gestiona
    yarn dev
    ```
 
-5. **Abrir el navegador**
+6. **Abrir el navegador**
    Navegar a `http://localhost:3000`
 
 ## 📝 Estructura del Proyecto
