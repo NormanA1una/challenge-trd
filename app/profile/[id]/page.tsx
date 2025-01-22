@@ -1,6 +1,5 @@
 "use client";
 
-import { supabase } from "@/lib/utils/supabase";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { use } from "react";
@@ -58,16 +57,18 @@ const ProfilePage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const { data, error } = await supabase
-        .from("user")
-        .select("*")
-        .eq("id", resolvedParams.id)
-        .single();
+      try {
+        const response = await fetch(`/api/get-user?id=${resolvedParams.id}`);
+        const data = await response.json();
 
-      if (error) {
-        setError(error.message);
-      } else {
-        setUserData(data);
+        if (!response.ok) {
+          setError(data.error);
+        } else {
+          setUserData(data);
+        }
+      } catch (err) {
+        setError("Error al obtener los datos del usuario");
+        console.error("Error fetching user data:", err);
       }
       setLoading(false);
     };
