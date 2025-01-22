@@ -19,3 +19,194 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.phone-input-container {
+  --react-international-phone-dropdown-position: top;
+}
+
+.phone-input-container .react-international-phone-country-selector-dropdown {
+  top: auto !important;
+  bottom: 100% !important;
+  margin-bottom: 8px;
+}
+
+.phone-input-container .react-international-phone-input {
+  background-color: #272A33 !important;
+  border-color: #272A33 !important;
+  color: #fff !important;
+}
+
+.phone-input-container .react-international-phone-country-selector-button {
+  background-color: #272A33 !important;
+  border-color: #272A33 !important;
+  color: #fff !important;
+}
+
+.phone-input-container .react-international-phone-country-selector-dropdown {
+  background-color: #272A33 !important;
+  border-color: #323642 !important;
+}
+
+.phone-input-container .react-international-phone-country-selector-dropdown-item {
+  color: #fff !important;
+}
+
+.phone-input-container .react-international-phone-country-selector-dropdown-item:hover {
+  background-color: #323642 !important;
+}
+
+/* Estilos para el selector de país del teléfono */
+.react-international-phone-country-selector-dropdown {
+  background-color: #272A33 !important;
+  color: #E5E7EB !important;
+  top: auto !important;
+  bottom: 100% !important;
+  margin-bottom: 8px !important;
+}
+
+.react-international-phone-country-selector-dropdown__list-item {
+  color: #E5E7EB !important;
+}
+
+.react-international-phone-country-selector-dropdown__list-item:hover {
+  background-color: #323642 !important;
+}
+
+.react-international-phone-country-selector-button {
+  background-color: #272A33 !important;
+  border: none !important;
+  color: #E5E7EB !important;
+  border-radius: 1rem !important;
+  height: 100% !important;
+  width: 100% !important;
+  aspect-ratio: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+.react-international-phone-country-selector-button__button-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.react-international-phone-country-selector-button__flag-emoji {
+  margin: 0 !important;
+  width: 24px !important;
+  height: 24px !important;
+  object-fit: contain !important;
+}
+
+.react-international-phone-country-selector-button__dropdown-arrow {
+  margin: 0 !important;
+  width: 12px !important;
+  height: 12px !important;
+}
+
+
+/* Spinner */
+
+.loader {
+  color: #ffffff;
+  font-size: 45px;
+  text-indent: -9999em;
+  overflow: hidden;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  position: relative;
+  transform: translateZ(0);
+  animation: mltShdSpin 1.7s infinite ease, round 1.7s infinite ease;
+}
+
+@keyframes mltShdSpin {
+  0% {
+    box-shadow: 0 -0.83em 0 -0.4em,
+    0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em,
+    0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+  }
+  5%,
+  95% {
+    box-shadow: 0 -0.83em 0 -0.4em, 
+    0 -0.83em 0 -0.42em, 0 -0.83em 0 -0.44em, 
+    0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+  }
+  10%,
+  59% {
+    box-shadow: 0 -0.83em 0 -0.4em, 
+    -0.087em -0.825em 0 -0.42em, -0.173em -0.812em 0 -0.44em, 
+    -0.256em -0.789em 0 -0.46em, -0.297em -0.775em 0 -0.477em;
+  }
+  20% {
+    box-shadow: 0 -0.83em 0 -0.4em, -0.338em -0.758em 0 -0.42em,
+     -0.555em -0.617em 0 -0.44em, -0.671em -0.488em 0 -0.46em, 
+     -0.749em -0.34em 0 -0.477em;
+  }
+  38% {
+    box-shadow: 0 -0.83em 0 -0.4em, -0.377em -0.74em 0 -0.42em,
+     -0.645em -0.522em 0 -0.44em, -0.775em -0.297em 0 -0.46em, 
+     -0.82em -0.09em 0 -0.477em;
+  }
+  100% {
+    box-shadow: 0 -0.83em 0 -0.4em, 0 -0.83em 0 -0.42em, 
+    0 -0.83em 0 -0.44em, 0 -0.83em 0 -0.46em, 0 -0.83em 0 -0.477em;
+  }
+}
+
+@keyframes round {
+  0% { transform: rotate(0deg) }
+  100% { transform: rotate(360deg) }
+}
+
+/* Estilos para inputs con autocompletado */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #272A33 inset !important;
+  -webkit-text-fill-color: #fff !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Para Firefox */
+input:autofill {
+  background-color: #272A33 !important;
+  color: #fff !important;
+}
+
+/* Animación del gradiente para el input de archivos */
+@keyframes gradientProgress {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.animate-gradient {
+  animation: gradientProgress 2s linear infinite;
+  background: linear-gradient(265.34deg, #FCB115 -18.6%, #E96DA2 67.73%, #00CDDA 111.5%);
+  background-size: 200% 100%;
+  opacity: 0.15;
+}
+
+@keyframes gradientProgress {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0%);
+    opacity: 0.7;
+  }
+}
+ 

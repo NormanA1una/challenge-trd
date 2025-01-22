@@ -1,101 +1,237 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import registerFormSchema, {
+  RegisterFormData,
+} from "@/lib/schemas/registerForm";
+import { DOC_TYPE } from "@/lib/constants/documents";
+import { CountrySelector } from "react-international-phone";
+import { supabase } from "@/lib/utils/supabase";
+
+import "react-international-phone/style.css";
+
+import Select from "@/components/forms/select";
+import Input from "@/components/forms/input";
+import FileInput from "@/components/forms/file-input";
+import Checkbox from "@/components/forms/checkbox";
+
+import loadingColors from "../public/images/loading-colors.png";
 import Image from "next/image";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+const HomePage = () => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [selectedCountryCode, setSelectedCountryCode] = useState("ec");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: yupResolver(registerFormSchema),
+    defaultValues: {
+      document_type: DOC_TYPE[0],
+      doc_number: "",
+      email: "",
+      phone_number: "",
+      name: "",
+      last_name: "",
+      photos: undefined,
+    },
+    mode: "onChange",
+  });
+
+  const onSubmit = async (data: RegisterFormData) => {
+    setLoading(true);
+    const imageUrls: string[] = [];
+    console.log("Fotos a subir:", data.photos);
+    try {
+      const formPhotos = data.photos as unknown as FileList;
+      if (formPhotos?.length > 0) {
+        for (const file of Array.from(formPhotos)) {
+          const fileExt = file.name.split(".").pop();
+          const fileName = `${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2)}.${fileExt}`;
+          const filePath = `public/${fileName}`;
+
+          const { data: uploadData, error: uploadError } =
+            await supabase.storage.from("trd_images").upload(filePath, file, {
+              cacheControl: "3600",
+              upsert: false,
+            });
+
+          if (uploadError) {
+            throw uploadError;
+          }
+
+          if (uploadData) {
+            const {
+              data: { publicUrl },
+            } = supabase.storage
+              .from("trd_images")
+              .getPublicUrl(uploadData.path);
+
+            imageUrls.push(publicUrl);
+          }
+        }
+      }
+
+      console.log("Fotos a subir:", formPhotos);
+
+      const payload = {
+        ...data,
+        photos: imageUrls,
+      };
+
+      console.log("Payload con imágenes:", payload);
+
+      const res = await fetch("/api/save-user", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const responseData = await res.json();
+      setTimeout(() => router.push(`/profile/${responseData.id}`), 3000);
+    } catch (error) {
+      console.error("Error al guardar el usuario:", error);
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center">
+        <Image
+          src={loadingColors}
+          alt="Loading Colors"
+          className="absolute inset-0 w-full h-full object-contain object-top pointer-events-none"
+        />
+        <div className="flex flex-col items-center gap-10 max-w-[300px] mx-auto">
+          <span className="loader"></span>
+          <p className="text-[27px] text-[#FFFFFF] text-center">
+            Estamos validando tus datos
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full w-full flex items-center justify-center py-14">
+      <div className="max-w-[695px] w-full mx-auto h-full flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold mb-16">TRD</h1>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-4 rounded-2xl w-full"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <div className="flex flex-col gap-4 bg-[#181A1F] py-6 px-4 w-full rounded-2xl">
+            <div>
+              <Input
+                label="Nombre"
+                register={register("name")}
+                error={errors.name?.message}
+                placeholder="Nombre"
+              />
+            </div>
+
+            <div>
+              <Input
+                label="Apellido"
+                register={register("last_name")}
+                error={errors.last_name?.message}
+                placeholder="Apellido"
+              />
+            </div>
+
+            <div>
+              <Select
+                label="Tipo de Documento"
+                register={register("document_type")}
+                error={errors.document_type?.message}
+                options={DOC_TYPE.map((type) => ({ value: type, label: type }))}
+              />
+            </div>
+
+            <div>
+              <Input
+                label="Número de Documento"
+                register={register("doc_number")}
+                error={errors.doc_number?.message}
+                placeholder="Número de Documento"
+              />
+            </div>
+
+            <div>
+              <Input
+                label="Correo Electrónico"
+                type="email"
+                register={register("email")}
+                error={errors.email?.message}
+                placeholder="Correo Electrónico"
+              />
+            </div>
+
+            <div className="flex gap-2 w-full">
+              <div className="w-[70px]">
+                <CountrySelector
+                  selectedCountry={selectedCountryCode}
+                  onSelect={(country) => {
+                    setSelectedCountryCode(country.iso2);
+                    setValue("phone_number", `+${country.dialCode}`);
+                  }}
+                />
+              </div>
+              <div className="flex-1">
+                <Input
+                  label="Número de Teléfono"
+                  type="tel"
+                  register={register("phone_number")}
+                  error={errors.phone_number?.message}
+                  placeholder="Número de Teléfono"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <p className="text-sm text-[#9396A5]">
+                Carga hasta 4 imágenes para tu perfil
+              </p>
+              <FileInput
+                register={register("photos")}
+                error={errors.photos?.message}
+                multiple
+                accept="image/*"
+                max={4}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 bg-[#181A1F] py-6 px-4 w-full rounded-2xl">
+            <p className="text-sm text-[#9396A5]">Datos de facturación</p>
+
+            <Checkbox
+              label="Usar los mismos datos para la facturación"
+              register={register("use_same_billing_data")}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#FCB115] text-black font-bold p-2 rounded hover:bg-[#FCB115]/80 disabled:bg-[#FCB115]/80"
+          >
+            {loading ? "Guardando..." : "Guardar"}
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
+};
+
+export default HomePage;
